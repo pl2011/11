@@ -1,0 +1,16 @@
+# Ile bloków przypada na 1 piksel mapy (1, 2, 4 lub 8). Mapa ma 128x128 px.
+default-zoom: 1
+
+# Co ile ms odświeżać teren, gdy gracz się rusza / stoi w miejscu
+move-refresh-ms: 250
+idle-refresh-ms: 1000
+
+# Tryb jaskini (pod ziemią / Nether): ile bloków w dół skanować od poziomu gracza
+cave-depth: 24
+
+show-coords: true      # pasek ze współrzędnymi na dole
+show-direction: true   # kreska pokazująca w którą stronę patrzysz
+
+use-offhand: true      # /minimap wkłada mapę do lewej ręki (jeśli pusta)
+give-on-join: false    # automatycznie włączaj minimapę po wejściu na serwer
+block-drop: true       # nie pozwalaj wyrzucić minimapy (wyłączasz ją komendą)
