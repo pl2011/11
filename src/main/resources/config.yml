@@ -1,16 +1,22 @@
-# Ile bloków przypada na 1 piksel mapy (1, 2, 4 lub 8). Mapa ma 128x128 px.
-default-zoom: 1
+# Zoom: ile bloków przypada na 1 punkt mapy (1, 2, 4 lub 8).
+default-zoom: 2
 
-# Co ile ms odświeżać teren, gdy gracz się rusza / stoi w miejscu
+# --- HUD (minimapa na ekranie, prawa strona) ---
+# Szerokość w kolumnach (nieparzysta, 9-41). Wysokość jest stała: 15 wierszy.
+hud-cols: 21
+# Co ile ticków odświeżać HUD (5 = 4 razy na sekundę)
+hud-update-ticks: 5
+# Automatycznie włączaj HUD po wejściu na serwer
+give-on-join: false
+
+# --- Tryb przedmiotu (/minimap item) ---
+# Co ile ms odświeżać teren na mapie, gdy gracz się rusza / stoi w miejscu
 move-refresh-ms: 250
 idle-refresh-ms: 1000
+show-coords: true
+show-direction: true
+use-offhand: true
+block-drop: true
 
 # Tryb jaskini (pod ziemią / Nether): ile bloków w dół skanować od poziomu gracza
 cave-depth: 24
-
-show-coords: true      # pasek ze współrzędnymi na dole
-show-direction: true   # kreska pokazująca w którą stronę patrzysz
-
-use-offhand: true      # /minimap wkłada mapę do lewej ręki (jeśli pusta)
-give-on-join: false    # automatycznie włączaj minimapę po wejściu na serwer
-block-drop: true       # nie pozwalaj wyrzucić minimapy (wyłączasz ją komendą)

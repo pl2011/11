@@ -2,12 +2,12 @@ name: Minimap
 version: '${project.version}'
 main: pl.minimap.MinimapPlugin
 api-version: '1.21'
-description: Minimapa jako przedmiot w lewej ręce - teren, pozycja, kierunek, koordynaty.
+description: Minimapa na ekranie (HUD w sidebarze) lub jako mapa w ręce.
 commands:
   minimap:
-    description: Włącza/wyłącza minimapę, zmienia zoom
+    description: Włącza/wyłącza minimapę HUD, zmienia zoom
     aliases: [m, mm]
-    usage: /<command> [zoom [1|2|4|8]] | reload
+    usage: /<command> [zoom [1|2|4|8]] | item | reload
 permissions:
   minimap.use:
     description: Używanie minimapy
