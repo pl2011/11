@@ -56,6 +56,7 @@ final class HudManager {
     private final Map<UUID, Hud> huds = new HashMap<>();
     private BukkitTask task;
     private boolean errorLogged = false;
+    private boolean hijackLogged = false;
 
     HudManager(MinimapPlugin plugin) {
         this.plugin = plugin;
@@ -132,6 +133,15 @@ final class HudManager {
                 continue;
             }
             try {
+                if (p.getScoreboard() != h.board) {
+                    // inny plugin przejął scoreboard gracza - przywracamy HUD
+                    p.setScoreboard(h.board);
+                    if (!hijackLogged) {
+                        hijackLogged = true;
+                        plugin.getLogger().warning("Inny plugin podmienia scoreboard gracza "
+                                + p.getName() + " - przywracam HUD minimapy.");
+                    }
+                }
                 update(p, h);
             } catch (Exception ex) {
                 if (!errorLogged) {
