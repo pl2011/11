@@ -48,10 +48,13 @@ public final class MinimapPlugin extends JavaPlugin implements Listener {
     boolean useOffhand = true;
     boolean giveOnJoin = false;
     boolean blockDrop = true;
+    int hudCols = 21;
+    int hudUpdateTicks = 5;
 
     // ===== STAN =====
     private NamespacedKey itemKey;
     private MinimapRenderer renderer;
+    private HudManager hud;
     private File dataFile;
     private int mapId = -1;
     private final Map<UUID, Integer> zoomByPlayer = new HashMap<>();
@@ -62,6 +65,7 @@ public final class MinimapPlugin extends JavaPlugin implements Listener {
         itemKey = new NamespacedKey(this, "minimap");
         dataFile = new File(getDataFolder(), "data.yml");
         renderer = new MinimapRenderer(this);
+        hud = new HudManager(this);
         loadSettings();
         loadData();
 
@@ -72,6 +76,11 @@ public final class MinimapPlugin extends JavaPlugin implements Listener {
             if (v != null) attach(v);
         }
         getLogger().info("Minimap włączony (zoom=" + defaultZoom + ").");
+    }
+
+    @Override
+    public void onDisable() {
+        if (hud != null) hud.shutdown();
     }
 
     // ===== KONFIGURACJA I DANE =====
@@ -87,6 +96,10 @@ public final class MinimapPlugin extends JavaPlugin implements Listener {
         useOffhand = c.getBoolean("use-offhand", true);
         giveOnJoin = c.getBoolean("give-on-join", false);
         blockDrop = c.getBoolean("block-drop", true);
+        int cols = Math.max(9, Math.min(41, c.getInt("hud-cols", 21)));
+        hudCols = (cols % 2 == 0) ? cols + 1 : cols;
+        hudUpdateTicks = Math.max(2, Math.min(40, c.getInt("hud-update-ticks", 5)));
+        if (hud != null) hud.start();
     }
 
     private void loadData() {
@@ -192,7 +205,7 @@ public final class MinimapPlugin extends JavaPlugin implements Listener {
         }
     }
 
-    private void msg(CommandSender s, String text, NamedTextColor color) {
+    void msg(CommandSender s, String text, NamedTextColor color) {
         s.sendMessage(Component.text("[Minimap] ", NamedTextColor.GOLD)
                 .append(Component.text(text, color)));
     }
@@ -218,6 +231,10 @@ public final class MinimapPlugin extends JavaPlugin implements Listener {
             return true;
         }
         if (args.length == 0) {
+            hud.toggle(p);
+            return true;
+        }
+        if (args[0].equalsIgnoreCase("item")) {
             toggle(p);
             return true;
         }
@@ -239,17 +256,17 @@ public final class MinimapPlugin extends JavaPlugin implements Listener {
                 z = cur == 1 ? 2 : cur == 2 ? 4 : cur == 4 ? 8 : 1;
             }
             zoomByPlayer.put(p.getUniqueId(), z);
-            msg(p, "Zoom: " + z + " blok(ów) na piksel.", NamedTextColor.GREEN);
+            msg(p, "Zoom: " + z + " blok(ów) na punkt mapy.", NamedTextColor.GREEN);
             return true;
         }
-        msg(p, "Użycie: /minimap | /minimap zoom [1|2|4|8]", NamedTextColor.YELLOW);
+        msg(p, "Użycie: /minimap | /minimap zoom [1|2|4|8] | /minimap item", NamedTextColor.YELLOW);
         return true;
     }
 
     @Override
     public List<String> onTabComplete(CommandSender s, Command c, String alias, String[] args) {
         if (args.length == 1) {
-            List<String> o = new ArrayList<>(List.of("zoom"));
+            List<String> o = new ArrayList<>(List.of("zoom", "item"));
             if (s.hasPermission("minimap.admin")) o.add("reload");
             String pre = args[0].toLowerCase();
             return o.stream().filter(x -> x.startsWith(pre)).toList();
@@ -269,12 +286,13 @@ public final class MinimapPlugin extends JavaPlugin implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
-        if (giveOnJoin && p.hasPermission("minimap.use") && !hasMinimap(p)) toggle(p);
+        if (giveOnJoin && p.hasPermission("minimap.use")) hud.enable(p);
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         renderer.forget(e.getPlayer().getUniqueId());
+        hud.remove(e.getPlayer().getUniqueId());
         zoomByPlayer.remove(e.getPlayer().getUniqueId());
     }
 
